@@ -628,10 +628,13 @@ func (ic *ContainerEngine) playKubePod(ctx context.Context, podName string, podY
 			if err != nil || mountPoint == "" {
 				return nil, nil, fmt.Errorf("unable to get mountpoint of volume %q: %w", vol.Name(), err)
 			}
+
+			eachVol := v
 			// Create files and add data to the volume mountpoint based on the Items in the volume
 			for k, v := range v.Items {
 				dataPath := filepath.Join(mountPoint, k)
 				f, err := os.Create(dataPath)
+				os.Chmod(f.Name(), os.FileMode(eachVol.DefaultMode))
 				if err != nil {
 					return nil, nil, fmt.Errorf("cannot create file %q at volume mountpoint %q: %w", k, mountPoint, err)
 				}
